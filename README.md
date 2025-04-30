@@ -10,7 +10,7 @@ A modern, passwordless login system using one-time passwords (OTP) to enhance us
 **
 
 ## Demo Images
-![App Screenshot](img/otp1.png)
+![App Screenshot](otp1.png)
 ![App Screenshot](otp2.png)
 ![App Screenshot](otp3.png)
 ---
