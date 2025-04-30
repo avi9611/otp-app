@@ -6,7 +6,7 @@ A modern, passwordless login system using one-time passwords (OTP) to enhance us
 
 ## 🚀 Live Demo
 
-**Deployed on:** [https://otp-app-henna.vercel.app/#/login]  
+**Deployed on:** [https://otp-app-henna.vercel.app/]  
 **
 
 ---
