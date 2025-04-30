@@ -9,6 +9,10 @@ A modern, passwordless login system using one-time passwords (OTP) to enhance us
 **Deployed on:** [https://otp-app-henna.vercel.app/]  
 **
 
+## Demo Images
+![App Screenshot](otp1.png)
+![App Screenshot](otp2.png)
+![App Screenshot](otp3.png)
 ---
 
 ## 📌 Problem Statement
