@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import axios from 'axios';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -11,14 +11,23 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-let otpStore = {}; 
+let otpStore = {};
 
-// Send OTP endpoint
+// Create nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+// Endpoint: Send OTP
 app.post('/send-otp', async (req, res) => {
   const { email } = req.body;
 
   if (!email || !email.includes('@')) {
-    return res.status(400).json({ error: 'Invalid email' });
+    return res.status(400).json({ error: 'Invalid email address' });
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -26,31 +35,24 @@ app.post('/send-otp', async (req, res) => {
 
   otpStore[email] = { otp, expiry };
 
-  try {
-    const result = await axios.post(
-      'https://api.resend.com/emails',
-      {
-        from: 'Acme <onboarding@resend.dev>', 
-        to: email,
-        subject: 'Your OTP Code',
-        html: `<p>Your OTP is <strong>${otp}</strong>. It will expire in 30 seconds.</p>`,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+  const mailOptions = {
+    from: `"OTP Auth App" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: 'Your OTP Code',
+    html: `<p>Your OTP is <strong>${otp}</strong>. It expires in 30 seconds.</p>`,
+  };
 
-    return res.status(200).json({ message: 'OTP sent via Resend' });
-  } catch (error) {
-    console.error('Resend Error:', error.response?.data || error.message);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`OTP sent to ${email}: ${otp}`);
+    return res.status(200).json({ message: 'OTP sent successfully' });
+  } catch (err) {
+    console.error('Email send error:', err);
     return res.status(500).json({ error: 'Failed to send OTP' });
   }
 });
 
-// Verify OTP endpoint
+// Endpoint: Verify OTP
 app.post('/verify-otp', (req, res) => {
   const { email, otp } = req.body;
   const record = otpStore[email];
@@ -64,7 +66,9 @@ app.post('/verify-otp', (req, res) => {
   }
 
   delete otpStore[email];
-  return res.status(200).json({ message: 'OTP verified' });
+  return res.status(200).json({ message: 'OTP verified successfully' });
 });
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
