@@ -52,5 +52,3 @@ In today's digital world, users often reuse passwords across platforms, making t
 
 ---
 
-## 📁 Project Structure
-
